@@ -2,24 +2,32 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Investigasi Kafe: Siapa yang Kentut?! ☕💨</title>
     <style>
         :root {
             --cafe-wood: #24140c;
             --table-wood: #4a3020;
             --gold: #f39c12;
+
+            /* Ukuran Desktop Default */
+            --card-w: 108px;
+            --head-w: 64px;
+            --head-h: 70px;
+            --table-gap: 12px;
+            --table-pad: 10px 12px 6px 12px;
         }
 
         * {
             box-sizing: border-box;
             user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             margin: 0;
-            padding: 8px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 8px 6px 18px 6px;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             background: #0b0705;
             color: #f7ede2;
             display: flex;
@@ -30,40 +38,47 @@
 
         header {
             text-align: center;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            width: 100%;
+            max-width: 960px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         h1 {
-            margin: 2px 0 6px 0;
-            font-size: 21px;
+            margin: 2px 0 8px 0;
+            font-size: 19px;
             color: var(--gold);
             text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            line-height: 1.25;
         }
 
         .controls {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
+            width: 100%;
             flex-wrap: wrap;
         }
 
         select, button {
-            padding: 8px 18px;
+            padding: 9px 16px;
             font-size: 13px;
             font-weight: 700;
-            border-radius: 6px;
+            border-radius: 8px;
             border: 1px solid #795548;
             background: #3e2723;
             color: #ffe0b2;
             cursor: pointer;
-            transition: all 0.2s;
+            touch-action: manipulation;
+            transition: background 0.15s, transform 0.1s;
         }
 
-        select:hover, button:hover {
-            background: #4e342e;
-            border-color: var(--gold);
+        select:active, button:active {
+            transform: scale(0.97);
         }
 
         button.btn-primary {
@@ -72,96 +87,105 @@
             color: #fff;
         }
 
-        button.btn-primary:hover {
-            background: #e67e22;
+        button.btn-primary:active {
+            background: #b84300;
         }
 
         .stats-bar {
             display: flex;
-            gap: 20px;
-            background: rgba(0,0,0,0.6);
-            padding: 5px 20px;
+            gap: 12px;
+            background: rgba(0,0,0,0.65);
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 13px;
+            font-size: 12px;
             border: 1px solid #4e342e;
+            width: fit-content;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         /* Suasana Kafe Ramai */
         #cafe-stage {
             position: relative;
-            width: 96vw;
+            width: 98vw;
             max-width: 960px;
-            height: 520px;
+            min-height: 430px;
+            height: auto;
             background: 
                 radial-gradient(circle at 50% 20%, rgba(255, 205, 130, 0.22), transparent 75%),
                 linear-gradient(to bottom, #180e09 0%, #110805 50%, #361f13 50%, #1e1008 100%);
-            border: 8px solid #23130a;
+            border: 6px solid #23130a;
             border-radius: 12px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.95), inset 0 0 100px rgba(0,0,0,0.85);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.85);
             overflow: hidden;
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-around;
+            justify-content: center;
+            align-content: flex-end;
             align-items: flex-end;
-            padding: 35px 10px 15px 10px;
+            gap: 12px;
+            padding: 42px 6px 16px 6px;
         }
 
         .chalkboard {
             position: absolute;
-            top: 10px;
-            left: 20px;
+            top: 8px;
+            left: 10px;
             background: #111;
-            border: 3px solid #8d6e63;
+            border: 2px solid #8d6e63;
             color: #cfd8dc;
-            padding: 4px 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
+            padding: 4px 8px;
+            font-family: monospace;
+            font-size: 10px;
             border-radius: 4px;
-            line-height: 1.3;
+            line-height: 1.25;
             pointer-events: none;
+            z-index: 2;
         }
 
         .pendant-lamp {
             position: absolute;
             top: 0;
             width: 2px;
-            height: 35px;
+            height: 32px;
             background: #666;
+            pointer-events: none;
         }
         .pendant-lamp::after {
             content: '';
             position: absolute;
-            bottom: -9px;
-            left: -8px;
-            width: 18px;
-            height: 11px;
+            bottom: -8px;
+            left: -7px;
+            width: 16px;
+            height: 10px;
             background: #ffb300;
             border-radius: 50% 50% 0 0;
-            box-shadow: 0 6px 18px #ffca28;
+            box-shadow: 0 4px 14px #ffca28;
         }
 
         /* Meja Kafe */
         .cafe-table {
             position: relative;
             background: var(--table-wood);
-            border: 4px solid #301b10;
-            border-radius: 18px;
-            padding: 10px 12px 6px 12px;
-            margin: 6px 8px;
-            box-shadow: 0 12px 25px rgba(0,0,0,0.7);
+            border: 3px solid #301b10;
+            border-radius: 14px;
+            padding: var(--table-pad);
+            margin: 4px 2px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.7);
             display: flex;
-            gap: 14px;
+            gap: var(--table-gap);
             align-items: flex-end;
             justify-content: center;
             z-index: 5;
+            max-width: 100%;
         }
 
         .table-items {
             position: absolute;
-            bottom: -6px;
+            bottom: -5px;
             display: flex;
-            gap: 12px;
-            font-size: 15px;
+            gap: 8px;
+            font-size: 13px;
             pointer-events: none;
             z-index: 10;
         }
@@ -173,33 +197,41 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.2s ease, filter 0.2s;
+            touch-action: manipulation;
+            transition: transform 0.15s ease, filter 0.15s;
             z-index: 6;
-            width: 110px;
+            width: var(--card-w);
         }
 
-        .char-card:hover {
-            transform: scale(1.04);
-            filter: drop-shadow(0 0 14px rgba(243, 156, 18, 0.85));
-            z-index: 25;
+        @media (hover: hover) {
+            .char-card:hover {
+                transform: scale(1.05);
+                filter: drop-shadow(0 0 12px rgba(243, 156, 18, 0.85));
+                z-index: 25;
+            }
+        }
+
+        .char-card:active {
+            transform: scale(0.96);
         }
 
         .char-card.accused-correct {
-            filter: drop-shadow(0 0 25px #2ecc71) !important;
+            filter: drop-shadow(0 0 18px #2ecc71) !important;
         }
 
         .char-card.accused-wrong {
-            filter: drop-shadow(0 0 25px #e74c3c) !important;
+            filter: drop-shadow(0 0 18px #e74c3c) !important;
         }
 
         /* Tubuh 2D SVG */
         .char-body-svg {
-            width: 110px;
-            height: 190px;
+            width: 100%;
+            height: auto;
+            display: block;
             overflow: visible;
         }
 
-        /* Animasi Bernapas Terpadu (Lengan & Badan Selalu Menyatu) */
+        /* Animasi Bernapas */
         .upper-torso-group {
             transform-origin: 54px 120px;
             animation: naturalBreath 3.2s ease-in-out infinite alternate;
@@ -216,12 +248,12 @@
             top: 2px;
             left: 50%;
             transform: translateX(-50%);
-            width: 64px;
-            height: 70px;
+            width: var(--head-w);
+            height: var(--head-h);
             border-radius: 46% 46% 42% 42%;
             overflow: hidden;
-            border: 2.5px solid #231610;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+            border: 2px solid #231610;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.7);
             background: #cfa083;
             transition: transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 15;
@@ -257,10 +289,10 @@
 
         .sweat-drop {
             position: absolute;
-            top: 10px;
-            right: 8px;
-            width: 7px;
-            height: 11px;
+            top: 8px;
+            right: 6px;
+            width: 6px;
+            height: 9px;
             background: #4fc3f7;
             border-radius: 50% 50% 50% 0;
             transform: rotate(-35deg);
@@ -269,32 +301,20 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.4);
         }
 
-        /* ANIMASI EKSPRESI WAJAH */
+        /* Animasi Wajah */
         .anim-sniff {
             animation: sniffMotion 1.5s ease-in-out infinite alternate;
         }
         @keyframes sniffMotion {
-            0% { transform: translateX(-50%) rotate(-10deg) translateY(-2px); }
-            100% { transform: translateX(-50%) rotate(10deg) translateY(1px); }
+            0% { transform: translateX(-50%) rotate(-8deg) translateY(-2px); }
+            100% { transform: translateX(-50%) rotate(8deg) translateY(1px); }
         }
 
-        .anim-disgust {
-            transform: translateX(-50%) translateY(4px) scale(0.96) !important;
-        }
+        .anim-disgust { transform: translateX(-50%) translateY(3px) scale(0.96) !important; }
+        .anim-shock { transform: translateX(-50%) translateY(-4px) scale(1.03) !important; }
+        .anim-suspicious { transform: translateX(-50%) rotate(5deg) translateY(1px) !important; }
+        .anim-confused { transform: translateX(-50%) rotate(-12deg) translateY(-2px) !important; }
 
-        .anim-shock {
-            transform: translateX(-50%) translateY(-5px) scale(1.04) !important;
-        }
-
-        .anim-suspicious {
-            transform: translateX(-50%) rotate(6deg) translateY(1px) !important;
-        }
-
-        .anim-confused {
-            transform: translateX(-50%) rotate(-16deg) translateY(-2px) !important;
-        }
-
-        /* Tremor Panik Pelaku (Menggetarkan Seluruh Tubuh Bersama Tanpa Lepas Sendi) */
         .char-card.anim-guilty-shake {
             animation: wholeBodyTremble 0.25s ease-in-out infinite alternate;
         }
@@ -304,16 +324,71 @@
         }
 
         .briefing-box {
-            margin-top: 8px;
+            margin-top: 10px;
             background: #231610;
-            border-left: 5px solid #d35400;
-            padding: 8px 16px;
+            border-left: 4px solid #d35400;
+            padding: 8px 12px;
             border-radius: 4px;
-            font-size: 13px;
+            font-size: 12px;
             color: #f5deb3;
+            width: 98vw;
             max-width: 960px;
             line-height: 1.4;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.5);
+        }
+
+        /* ================================================= */
+        /* MEDIA QUERIES (OPTIMASI KHUSUS TABLET & HP)      */
+        /* ================================================= */
+        @media (max-width: 768px) {
+            :root {
+                --card-w: 86px;
+                --head-w: 52px;
+                --head-h: 56px;
+                --table-gap: 8px;
+                --table-pad: 8px 8px 5px 8px;
+            }
+            .controls {
+                flex-direction: column;
+                width: 100%;
+            }
+            .controls select, .controls button {
+                width: 100%;
+                max-width: 360px;
+            }
+            .stats-bar {
+                width: 100%;
+                max-width: 360px;
+                justify-content: space-between;
+            }
+            #cafe-stage {
+                min-height: 420px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            :root {
+                --card-w: 68px;
+                --head-w: 42px;
+                --head-h: 46px;
+                --table-gap: 5px;
+                --table-pad: 6px 5px 4px 5px;
+            }
+            h1 { font-size: 16px; }
+            .chalkboard { font-size: 8.5px; padding: 2px 5px; top: 5px; left: 6px; }
+            .pendant-lamp { height: 22px; }
+            .table-items { font-size: 11px; }
+        }
+
+        @media (max-width: 360px) {
+            :root {
+                --card-w: 58px;
+                --head-w: 36px;
+                --head-h: 40px;
+                --table-gap: 3px;
+                --table-pad: 5px 3px 3px 3px;
+            }
+            .chalkboard { display: none; } /* Sembunyikan menu kecil di HP super sempit */
         }
     </style>
 </head>
@@ -323,32 +398,31 @@
         <h1>☕ KASUS KAFE: SIAPA YANG KENTUT?! 🕵️‍♂️</h1>
         <div class="controls">
             <select id="levelSelect" onchange="initRound()">
-                <option value="easy">Level 1: Easy (6 Orang - Pelaku Merona Merah Padam & Panik Gemetar)</option>
-                <option value="medium">Level 2: Medium (8 Orang - Pelaku Pura-pura Santai & Melirik Cemas)</option>
-                <option value="hard">Level 3: Hard (10 Orang - Pelaku Mematung Kaku 0.5 Detik)</option>
-                <option value="expert">Level 4: Expert (12 Orang - Mikro-Lirikan 0.2 Detik, Sangat Halus!)</option>
+                <option value="easy">Level 1: Easy (6 Orang - Pelaku Merona & Gemetar)</option>
+                <option value="medium">Level 2: Medium (8 Orang - Melirik Cemas)</option>
+                <option value="hard">Level 3: Hard (10 Orang - Mematung 0.5 Detik)</option>
+                <option value="expert">Level 4: Expert (12 Orang - Mikro-Lirikan 0.2 Detik)</option>
             </select>
-            <button class="btn-primary" onclick="triggerScene()">▶ Bunyikan Kentut & Tebak Pelaku</button>
+            <button class="btn-primary" onclick="triggerScene()">▶ Bunyikan Kentut & Tebak</button>
         </div>
         <div class="stats-bar">
             <span>Skor: <b id="scoreVal" style="color:#ffb74d;">0</b></span>
             <span>Streak: <b id="streakVal" style="color:#81c784;">0</b></span>
-            <span>Status: <b id="statusText" style="color:#64b5f6;">Klik "Bunyikan Kentut"</b></span>
+            <span>Status: <b id="statusText" style="color:#64b5f6;">Klik tombol di atas</b></span>
         </div>
     </header>
 
     <div id="cafe-stage">
-        <div class="chalkboard">☕ COFFEE MENU<br>• Espresso Roast<br>• Hazelnut Latte<br>• Butter Croissant</div>
+        <div class="chalkboard">☕ COFFEE MENU<br>• Espresso<br>• Latte<br>• Croissant</div>
         <div class="pendant-lamp" style="left: 18%;"></div>
         <div class="pendant-lamp" style="left: 50%;"></div>
         <div class="pendant-lamp" style="left: 82%;"></div>
     </div>
 
     <div class="briefing-box" id="briefing-box">
-        <b>Fokus Investigasi:</b> Semua orang sedang asyik berkegiatan (main HP, ngopi, makan croissant, mengetik). Dengarkan suara kentutnya dan amati siapa yang panik!
+        <b>Fokus Investigasi:</b> Semua orang sedang asyik berkegiatan. Dengarkan kentutnya dan amati siapa yang panik!
     </div>
 
-    <!-- ELEMEN AUDIO OTOMATIS: MEMBACA FILE SUARA DARI FOLDER -->
     <audio id="fartAudio" preload="auto">
         <source src="suara.mp3" type="audio/mpeg">
         <source src="kentut.mp3" type="audio/mpeg">
@@ -362,26 +436,26 @@
         function playFartSound() {
             fartAudio.currentTime = 0;
             fartAudio.play().catch(e => {
-                console.log("Audio play error:", e);
+                console.log("Audio play notice:", e);
             });
         }
 
         const levelData = {
             easy: {
                 tables: [2, 2, 2],
-                hint: "Level Easy: <b>Semua orang sedang sibuk berkegiatan</b> (main HP, ngopi, makan). Saat kentut berbunyi, pelaku langsung <b>MERAH PADAM</b>, panik gemetar, dan berkeringat dingin!"
+                hint: "Level Easy: Pelaku langsung <b>MERAH PADAM</b>, panik gemetar, dan berkeringat dingin!"
             },
             medium: {
                 tables: [3, 2, 3],
-                hint: "Level Medium: Semua orang berekspresi aktif di mejanya. Pelaku <b>pura-pura santai melanjutkan kegiatannya</b> tetapi pipinya merona dan matanya melirik cemas."
+                hint: "Level Medium: Pelaku <b>pura-pura santai</b> tapi pipinya merona dan matanya melirik cemas."
             },
             hard: {
                 tables: [3, 4, 3],
-                hint: "Level Hard: Keramaian kafe bereaksi serempak. Pelaku <b>mematung kaku selama 0.5 detik</b> sambil mengatupkan bibirnya rapat."
+                hint: "Level Hard: Pelaku <b>mematung kaku selama 0.5 detik</b> sambil mengatupkan bibirnya rapat."
             },
             expert: {
                 tables: [4, 4, 4],
-                hint: "Level Expert: 12 Orang berkegiatan di kafe! Pelaku tetap berkegiatan normal namun ada <b>mikro-kedipan dan lirikan 0.2 detik</b> pas detik pertama bunyi kentut. Nol pola!"
+                hint: "Level Expert: 12 Orang di kafe! Ada <b>mikro-kedipan 0.2 detik</b> saat pertama kali kentut berbunyi!"
             }
         };
 
@@ -396,10 +470,8 @@
         const briefing = document.getElementById('briefing-box');
         const statusText = document.getElementById('statusText');
 
-        // ANATOMI LENGAN DAN PROPERTI KEGIATAN YANG MENYATU DENGAN TUBUH (TIDAK AKAN LEPAS)
         function generateFixedActivitySVG(activityType) {
             if (activityType === 0) {
-                // Main Smartphone
                 return `
                     <path d="M26 62 Q18 85 40 98 L48 94 Q30 84 34 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
                     <path d="M80 62 Q88 85 66 98 L58 94 Q76 84 72 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
@@ -409,7 +481,6 @@
                     <rect x="47" y="82" width="12" height="18" rx="1.5" fill="#38ada9" opacity="0.9"/>
                 `;
             } else if (activityType === 1) {
-                // Menyesap Kopi
                 return `
                     <path d="M26 62 Q20 85 36 96 L42 90 Q30 80 34 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
                     <path d="M80 62 Q88 80 65 84 L64 78 Q78 74 72 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
@@ -419,7 +490,6 @@
                     <ellipse cx="55.5" cy="71" rx="6.5" ry="2" fill="#543729"/>
                 `;
             } else if (activityType === 2) {
-                // Makan Croissant
                 return `
                     <path d="M26 62 Q20 85 38 94 L44 88 Q30 80 34 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
                     <path d="M80 62 Q86 78 66 80 L65 74 Q76 72 72 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
@@ -428,7 +498,6 @@
                     <path d="M50 66 Q54 71 58 67" stroke="#f6b93b" stroke-width="1.5" fill="none"/>
                 `;
             } else if (activityType === 3) {
-                // Mengetik Laptop
                 return `
                     <path d="M26 62 Q20 85 44 98 L48 92 Q32 82 34 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
                     <path d="M80 62 Q86 85 62 98 L58 92 Q74 82 72 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
@@ -439,7 +508,6 @@
                     <rect x="40" y="92" width="26" height="10" fill="#70a1ff" opacity="0.85"/>
                 `;
             } else {
-                // Membaca Buku/Menu
                 return `
                     <path d="M26 62 Q20 85 42 94 L46 88 Q32 80 34 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
                     <path d="M80 62 Q86 85 64 94 L60 88 Q74 80 72 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
@@ -455,29 +523,26 @@
             const activityType = id % 5;
             return `
                 <div class="head-rig" id="head-rig-${id}">
-                    <!-- Foto Kepala Langsung dari Folder (kepala.jpeg / kepala.png) -->
-                    <img class="head-base-img" src="kepala.jpeg" onerror="if(!this.triedPng){this.triedPng=true;this.src='kepala.png';}else if(!this.triedFoto){this.triedFoto=true;this.src='foto.jpg';}" alt="Wajah">
+                    <!-- Mendukung nama file kepala.png, kepala.jpg, kepala.jpeg secara otomatis -->
+                    <img class="head-base-img" 
+                         src="kepala.png" 
+                         onerror="if(!this.triedJpg){this.triedJpg=true;this.src='kepala.jpg';}else if(!this.triedJpeg){this.triedJpeg=true;this.src='kepala.jpeg';}else if(!this.triedFoto){this.triedFoto=true;this.src='foto.jpg';}" 
+                         alt="Wajah">
                     <div class="blush-layer" id="blush-${id}"></div>
                     <div class="sweat-drop" id="sweat-${id}"></div>
 
-                    <!-- Rig Ekspresi Wajah Interaktif di Atas Foto Kepala -->
                     <svg class="face-overlay-svg" id="face-svg-${id}" viewBox="0 0 62 68">
                         <path id="brow-l-${id}" d="M19 28 Q24 26 29 28" stroke="#1c140e" stroke-width="2.3" stroke-linecap="round" fill="none" opacity="0"/>
                         <path id="brow-r-${id}" d="M35 28 Q40 26 45 28" stroke="#1c140e" stroke-width="2.3" stroke-linecap="round" fill="none" opacity="0"/>
-
                         <circle id="pupil-l-${id}" cx="24" cy="33" r="2.3" fill="#18110b" opacity="0"/>
                         <circle id="pupil-r-${id}" cx="40" cy="33" r="2.3" fill="#18110b" opacity="0"/>
-
                         <path id="eyelid-l-${id}" d="M19 33 Q24 33 29 33" stroke="#231610" stroke-width="3.2" fill="none" opacity="0"/>
                         <path id="eyelid-r-${id}" d="M35 33 Q40 33 45 33" stroke="#231610" stroke-width="3.2" fill="none" opacity="0"/>
-
                         <path id="wrinkle-${id}" d="M30 35 Q32 34 34 35 M29 37 Q32 36 35 37" stroke="#5d3622" stroke-width="1.5" fill="none" opacity="0"/>
-
                         <path id="mouth-${id}" d="M25 48 Q32 54 39 48" stroke="#683424" stroke-width="2.4" stroke-linecap="round" fill="none" opacity="0"/>
                     </svg>
                 </div>
 
-                <!-- Badan 2D Utuh: Anatomi Terpadu Satu Kerangka -->
                 <svg class="char-body-svg" viewBox="0 0 110 190">
                     <g>
                         <path d="M41 120 L36 179 L47 179 L51 120 Z" fill="#1b1c1e" stroke="#101112" stroke-width="1.5"/>
@@ -486,8 +551,6 @@
                         <path d="M32 179 L49 179 C50 184 45 188 37 188 C31 188 30 183 32 179 Z" fill="#0d0e10"/>
                         <path d="M59 179 L76 179 C78 184 74 188 66 188 C60 188 58 183 59 179 Z" fill="#0d0e10"/>
                     </g>
-
-                    <!-- GRUP BADAN & LENGAN TERSAMBUNG KOKOH -->
                     <g class="upper-torso-group" id="upper-torso-${id}">
                         <path d="M26 60 L20 122 Q53 128 86 122 L80 60 Q53 52 26 60 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
                         <line x1="53.5" y1="58" x2="53.5" y2="122" stroke="#48413b" stroke-width="2"/>
@@ -497,13 +560,10 @@
 
                         <rect x="33" y="68" width="15" height="13" rx="1.5" fill="#655b53" stroke="#48413b" stroke-width="1"/>
                         <path d="M33 68 L40.5 72 L48 68 Z" fill="#524a43" stroke="#48413b" stroke-width="0.8"/>
-
                         <rect x="58" y="68" width="15" height="13" rx="1.5" fill="#655b53" stroke="#48413b" stroke-width="1"/>
                         <path d="M58 68 L65.5 72 L73 68 Z" fill="#524a43" stroke="#48413b" stroke-width="0.8"/>
-
                         <polygon points="53.5,61 44,53 35,59 43,64" fill="#84786e" stroke="#48413b" stroke-width="1"/>
                         <polygon points="53.5,61 63,53 72,59 64,64" fill="#84786e" stroke="#48413b" stroke-width="1"/>
-
                         ${generateFixedActivitySVG(activityType)}
                     </g>
                 </svg>
@@ -516,8 +576,8 @@
 
             const level = document.getElementById('levelSelect').value;
             const config = levelData[level];
-            briefing.innerHTML = `<b>Petunjuk Level:</b> ${config.hint}`;
-            statusText.innerText = "Siap. Klik 'Bunyikan Kentut'!";
+            briefing.innerHTML = `<b>Petunjuk:</b> ${config.hint}`;
+            statusText.innerText = "Siap! Tekan tombol 'Bunyikan Kentut'";
             isInvestigating = false;
 
             document.querySelectorAll('.cafe-table').forEach(t => t.remove());
@@ -545,8 +605,6 @@
             });
 
             totalChars = charIndex;
-
-            // ZERO PATTERN: Pelaku murni diacak setiap ronde
             culpritId = Math.floor(Math.random() * totalChars);
             resetAllFaceExpressions();
         }
@@ -584,14 +642,11 @@
             isInvestigating = false;
 
             const currentLevel = document.getElementById('levelSelect').value;
-
-            // Putar file suara kentut dari folder
             playFartSound();
 
-            // Selaraskan reaksi dengan puncak letupan suara kentut
             setTimeout(() => {
                 isInvestigating = true;
-                statusText.innerText = "👉 AMATI KEGIATAN & WAJAH YANG PANIK!";
+                statusText.innerText = "👉 KETUK ORANG YANG MENURUTMU PELAKU!";
                 animateEveryoneInCafe(currentLevel);
             }, 1100);
         }
@@ -740,14 +795,14 @@
             if (guessedId === culpritId) {
                 score += pointsMap[document.getElementById('levelSelect').value];
                 streak++;
-                statusText.innerHTML = "🎯 <span style='color:#2ecc71;'>TEPAT SEKALI! Pelakunya tertangkap basah!</span>";
+                statusText.innerHTML = "🎯 <span style='color:#2ecc71;'>TEPAT SEKALI! Pelakunya tertangkap!</span>";
                 guessedCard.classList.add('accused-correct');
 
                 document.getElementById(`blush-${culpritId}`).style.opacity = '1';
                 document.getElementById(`sweat-${culpritId}`).style.opacity = '1';
             } else {
                 streak = 0;
-                statusText.innerHTML = "❌ <span style='color:#e74c3c;'>SALAH TUDUH! Dia cuma pengunjung biasa!</span>";
+                statusText.innerHTML = "❌ <span style='color:#e74c3c;'>SALAH! Dia bukan pelakunya!</span>";
                 guessedCard.classList.add('accused-wrong');
 
                 setTimeout(() => {
