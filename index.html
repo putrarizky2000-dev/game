@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investigasi Kafe: Siapa yang Kentut?! ☕💨</title>
+    <style>
+        :root {
+            --cafe-wood: #24140c;
+            --table-wood: #4a3020;
+            --gold: #f39c12;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 8px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0b0705;
+            color: #f7ede2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        h1 {
+            margin: 2px 0 6px 0;
+            font-size: 21px;
+            color: var(--gold);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 6px;
+            flex-wrap: wrap;
+        }
+
+        select, button {
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 6px;
+            border: 1px solid #795548;
+            background: #3e2723;
+            color: #ffe0b2;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        select:hover, button:hover {
+            background: #4e342e;
+            border-color: var(--gold);
+        }
+
+        button.btn-primary {
+            background: #d35400;
+            border-color: #e67e22;
+            color: #fff;
+        }
+
+        button.btn-primary:hover {
+            background: #e67e22;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            border: 1px solid #4e342e;
+        }
+
+        /* Suasana Kafe Ramai */
+        #cafe-stage {
+            position: relative;
+            width: 96vw;
+            max-width: 960px;
+            height: 520px;
+            background: 
+                radial-gradient(circle at 50% 20%, rgba(255, 205, 130, 0.22), transparent 75%),
+                linear-gradient(to bottom, #180e09 0%, #110805 50%, #361f13 50%, #1e1008 100%);
+            border: 8px solid #23130a;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.95), inset 0 0 100px rgba(0,0,0,0.85);
+            overflow: hidden;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: flex-end;
+            padding: 35px 10px 15px 10px;
+        }
+
+        .chalkboard {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            background: #111;
+            border: 3px solid #8d6e63;
+            color: #cfd8dc;
+            padding: 4px 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            border-radius: 4px;
+            line-height: 1.3;
+            pointer-events: none;
+        }
+
+        .pendant-lamp {
+            position: absolute;
+            top: 0;
+            width: 2px;
+            height: 35px;
+            background: #666;
+        }
+        .pendant-lamp::after {
+            content: '';
+            position: absolute;
+            bottom: -9px;
+            left: -8px;
+            width: 18px;
+            height: 11px;
+            background: #ffb300;
+            border-radius: 50% 50% 0 0;
+            box-shadow: 0 6px 18px #ffca28;
+        }
+
+        /* Meja Kafe */
+        .cafe-table {
+            position: relative;
+            background: var(--table-wood);
+            border: 4px solid #301b10;
+            border-radius: 18px;
+            padding: 10px 12px 6px 12px;
+            margin: 6px 8px;
+            box-shadow: 0 12px 25px rgba(0,0,0,0.7);
+            display: flex;
+            gap: 14px;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 5;
+        }
+
+        .table-items {
+            position: absolute;
+            bottom: -6px;
+            display: flex;
+            gap: 12px;
+            font-size: 15px;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        /* Kartu Karakter */
+        .char-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, filter 0.2s;
+            z-index: 6;
+            width: 110px;
+        }
+
+        .char-card:hover {
+            transform: scale(1.04);
+            filter: drop-shadow(0 0 14px rgba(243, 156, 18, 0.85));
+            z-index: 25;
+        }
+
+        .char-card.accused-correct {
+            filter: drop-shadow(0 0 25px #2ecc71) !important;
+        }
+
+        .char-card.accused-wrong {
+            filter: drop-shadow(0 0 25px #e74c3c) !important;
+        }
+
+        /* Tubuh 2D SVG */
+        .char-body-svg {
+            width: 110px;
+            height: 190px;
+            overflow: visible;
+        }
+
+        /* Animasi Bernapas Terpadu (Lengan & Badan Selalu Menyatu) */
+        .upper-torso-group {
+            transform-origin: 54px 120px;
+            animation: naturalBreath 3.2s ease-in-out infinite alternate;
+        }
+
+        @keyframes naturalBreath {
+            0% { transform: scaleY(1) translateY(0); }
+            100% { transform: scaleY(1.018) translateY(-1.5px); }
+        }
+
+        /* Kepala Berbasis Foto */
+        .head-rig {
+            position: absolute;
+            top: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 64px;
+            height: 70px;
+            border-radius: 46% 46% 42% 42%;
+            overflow: hidden;
+            border: 2.5px solid #231610;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+            background: #cfa083;
+            transition: transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 15;
+        }
+
+        .head-base-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: 50% 18%;
+            pointer-events: none;
+            display: block;
+        }
+
+        .face-overlay-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: visible;
+        }
+
+        .blush-layer {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 68%, rgba(235, 47, 47, 0.88), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .sweat-drop {
+            position: absolute;
+            top: 10px;
+            right: 8px;
+            width: 7px;
+            height: 11px;
+            background: #4fc3f7;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-35deg);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        /* ANIMASI EKSPRESI WAJAH */
+        .anim-sniff {
+            animation: sniffMotion 1.5s ease-in-out infinite alternate;
+        }
+        @keyframes sniffMotion {
+            0% { transform: translateX(-50%) rotate(-10deg) translateY(-2px); }
+            100% { transform: translateX(-50%) rotate(10deg) translateY(1px); }
+        }
+
+        .anim-disgust {
+            transform: translateX(-50%) translateY(4px) scale(0.96) !important;
+        }
+
+        .anim-shock {
+            transform: translateX(-50%) translateY(-5px) scale(1.04) !important;
+        }
+
+        .anim-suspicious {
+            transform: translateX(-50%) rotate(6deg) translateY(1px) !important;
+        }
+
+        .anim-confused {
+            transform: translateX(-50%) rotate(-16deg) translateY(-2px) !important;
+        }
+
+        /* Tremor Panik Pelaku (Menggetarkan Seluruh Tubuh Bersama Tanpa Lepas Sendi) */
+        .char-card.anim-guilty-shake {
+            animation: wholeBodyTremble 0.25s ease-in-out infinite alternate;
+        }
+        @keyframes wholeBodyTremble {
+            0% { transform: translateX(-2px) rotate(-1deg); }
+            100% { transform: translateX(2px) rotate(1deg); }
+        }
+
+        .briefing-box {
+            margin-top: 8px;
+            background: #231610;
+            border-left: 5px solid #d35400;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #f5deb3;
+            max-width: 960px;
+            line-height: 1.4;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>☕ KASUS KAFE: SIAPA YANG KENTUT?! 🕵️‍♂️</h1>
+        <div class="controls">
+            <select id="levelSelect" onchange="initRound()">
+                <option value="easy">Level 1: Easy (6 Orang - Pelaku Merona Merah Padam & Panik Gemetar)</option>
+                <option value="medium">Level 2: Medium (8 Orang - Pelaku Pura-pura Santai & Melirik Cemas)</option>
+                <option value="hard">Level 3: Hard (10 Orang - Pelaku Mematung Kaku 0.5 Detik)</option>
+                <option value="expert">Level 4: Expert (12 Orang - Mikro-Lirikan 0.2 Detik, Sangat Halus!)</option>
+            </select>
+            <button class="btn-primary" onclick="triggerScene()">▶ Bunyikan Kentut & Tebak Pelaku</button>
+        </div>
+        <div class="stats-bar">
+            <span>Skor: <b id="scoreVal" style="color:#ffb74d;">0</b></span>
+            <span>Streak: <b id="streakVal" style="color:#81c784;">0</b></span>
+            <span>Status: <b id="statusText" style="color:#64b5f6;">Klik "Bunyikan Kentut"</b></span>
+        </div>
+    </header>
+
+    <div id="cafe-stage">
+        <div class="chalkboard">☕ COFFEE MENU<br>• Espresso Roast<br>• Hazelnut Latte<br>• Butter Croissant</div>
+        <div class="pendant-lamp" style="left: 18%;"></div>
+        <div class="pendant-lamp" style="left: 50%;"></div>
+        <div class="pendant-lamp" style="left: 82%;"></div>
+    </div>
+
+    <div class="briefing-box" id="briefing-box">
+        <b>Fokus Investigasi:</b> Semua orang sedang asyik berkegiatan (main HP, ngopi, makan croissant, mengetik). Dengarkan suara kentutnya dan amati siapa yang panik!
+    </div>
+
+    <!-- ELEMEN AUDIO OTOMATIS: MEMBACA FILE SUARA DARI FOLDER -->
+    <audio id="fartAudio" preload="auto">
+        <source src="suara.mp3" type="audio/mpeg">
+        <source src="kentut.mp3" type="audio/mpeg">
+        <source src="suara.mp4" type="video/mp4">
+        <source src="kentut.mp4" type="video/mp4">
+    </audio>
+
+    <script>
+        const fartAudio = document.getElementById('fartAudio');
+
+        function playFartSound() {
+            fartAudio.currentTime = 0;
+            fartAudio.play().catch(e => {
+                console.log("Audio play error:", e);
+            });
+        }
+
+        const levelData = {
+            easy: {
+                tables: [2, 2, 2],
+                hint: "Level Easy: <b>Semua orang sedang sibuk berkegiatan</b> (main HP, ngopi, makan). Saat kentut berbunyi, pelaku langsung <b>MERAH PADAM</b>, panik gemetar, dan berkeringat dingin!"
+            },
+            medium: {
+                tables: [3, 2, 3],
+                hint: "Level Medium: Semua orang berekspresi aktif di mejanya. Pelaku <b>pura-pura santai melanjutkan kegiatannya</b> tetapi pipinya merona dan matanya melirik cemas."
+            },
+            hard: {
+                tables: [3, 4, 3],
+                hint: "Level Hard: Keramaian kafe bereaksi serempak. Pelaku <b>mematung kaku selama 0.5 detik</b> sambil mengatupkan bibirnya rapat."
+            },
+            expert: {
+                tables: [4, 4, 4],
+                hint: "Level Expert: 12 Orang berkegiatan di kafe! Pelaku tetap berkegiatan normal namun ada <b>mikro-kedipan dan lirikan 0.2 detik</b> pas detik pertama bunyi kentut. Nol pola!"
+            }
+        };
+
+        let culpritId = -1;
+        let totalChars = 0;
+        let isInvestigating = false;
+        let score = 0;
+        let streak = 0;
+        let activeIntervals = [];
+
+        const stage = document.getElementById('cafe-stage');
+        const briefing = document.getElementById('briefing-box');
+        const statusText = document.getElementById('statusText');
+
+        // ANATOMI LENGAN DAN PROPERTI KEGIATAN YANG MENYATU DENGAN TUBUH (TIDAK AKAN LEPAS)
+        function generateFixedActivitySVG(activityType) {
+            if (activityType === 0) {
+                // Main Smartphone
+                return `
+                    <path d="M26 62 Q18 85 40 98 L48 94 Q30 84 34 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
+                    <path d="M80 62 Q88 85 66 98 L58 94 Q76 84 72 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
+                    <path d="M40 98 Q46 102 50 96" stroke="#ba8b6f" stroke-width="7" fill="none" stroke-linecap="round"/>
+                    <path d="M66 98 Q60 102 56 96" stroke="#c9977b" stroke-width="7" fill="none" stroke-linecap="round"/>
+                    <rect x="45" y="80" width="16" height="24" rx="3" fill="#1b1c1e" stroke="#444" stroke-width="1.2"/>
+                    <rect x="47" y="82" width="12" height="18" rx="1.5" fill="#38ada9" opacity="0.9"/>
+                `;
+            } else if (activityType === 1) {
+                // Menyesap Kopi
+                return `
+                    <path d="M26 62 Q20 85 36 96 L42 90 Q30 80 34 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
+                    <path d="M80 62 Q88 80 65 84 L64 78 Q78 74 72 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
+                    <path d="M65 84 Q58 84 56 80" stroke="#c9977b" stroke-width="7" fill="none" stroke-linecap="round"/>
+                    <rect x="48" y="70" width="15" height="16" rx="2" fill="#f8f9fa" stroke="#ced4da" stroke-width="1"/>
+                    <path d="M63 74 Q67 78 63 82" fill="none" stroke="#ced4da" stroke-width="2.5"/>
+                    <ellipse cx="55.5" cy="71" rx="6.5" ry="2" fill="#543729"/>
+                `;
+            } else if (activityType === 2) {
+                // Makan Croissant
+                return `
+                    <path d="M26 62 Q20 85 38 94 L44 88 Q30 80 34 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
+                    <path d="M80 62 Q86 78 66 80 L65 74 Q76 72 72 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
+                    <path d="M66 80 Q58 80 55 76" stroke="#c9977b" stroke-width="7" fill="none" stroke-linecap="round"/>
+                    <path d="M46 68 Q54 60 62 68 Q54 75 46 68 Z" fill="#e58e26" stroke="#b71540" stroke-width="0.8"/>
+                    <path d="M50 66 Q54 71 58 67" stroke="#f6b93b" stroke-width="1.5" fill="none"/>
+                `;
+            } else if (activityType === 3) {
+                // Mengetik Laptop
+                return `
+                    <path d="M26 62 Q20 85 44 98 L48 92 Q32 82 34 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
+                    <path d="M80 62 Q86 85 62 98 L58 92 Q74 82 72 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
+                    <path d="M44 98 L50 102" stroke="#ba8b6f" stroke-width="7" stroke-linecap="round"/>
+                    <path d="M62 98 L56 102" stroke="#c9977b" stroke-width="7" stroke-linecap="round"/>
+                    <polygon points="36,104 70,104 76,116 30,116" fill="#4a4d52" stroke="#2c3e50" stroke-width="1"/>
+                    <rect x="38" y="90" width="30" height="14" rx="1.5" fill="#747d8c" stroke="#2c3e50" stroke-width="1"/>
+                    <rect x="40" y="92" width="26" height="10" fill="#70a1ff" opacity="0.85"/>
+                `;
+            } else {
+                // Membaca Buku/Menu
+                return `
+                    <path d="M26 62 Q20 85 42 94 L46 88 Q32 80 34 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
+                    <path d="M80 62 Q86 85 64 94 L60 88 Q74 80 72 65 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
+                    <path d="M42 94 Q48 98 51 94" stroke="#ba8b6f" stroke-width="7" fill="none" stroke-linecap="round"/>
+                    <path d="M64 94 Q58 98 55 94" stroke="#c9977b" stroke-width="7" fill="none" stroke-linecap="round"/>
+                    <polygon points="38,80 53,84 53,103 38,97" fill="#f8efba" stroke="#68553d" stroke-width="1"/>
+                    <polygon points="68,80 53,84 53,103 68,97" fill="#fff" stroke="#68553d" stroke-width="1"/>
+                `;
+            }
+        }
+
+        function renderCharacterHTML(id) {
+            const activityType = id % 5;
+            return `
+                <div class="head-rig" id="head-rig-${id}">
+                    <!-- Foto Kepala Langsung dari Folder (kepala.jpeg / kepala.png) -->
+                    <img class="head-base-img" src="kepala.jpeg" onerror="if(!this.triedPng){this.triedPng=true;this.src='kepala.png';}else if(!this.triedFoto){this.triedFoto=true;this.src='foto.jpg';}" alt="Wajah">
+                    <div class="blush-layer" id="blush-${id}"></div>
+                    <div class="sweat-drop" id="sweat-${id}"></div>
+
+                    <!-- Rig Ekspresi Wajah Interaktif di Atas Foto Kepala -->
+                    <svg class="face-overlay-svg" id="face-svg-${id}" viewBox="0 0 62 68">
+                        <path id="brow-l-${id}" d="M19 28 Q24 26 29 28" stroke="#1c140e" stroke-width="2.3" stroke-linecap="round" fill="none" opacity="0"/>
+                        <path id="brow-r-${id}" d="M35 28 Q40 26 45 28" stroke="#1c140e" stroke-width="2.3" stroke-linecap="round" fill="none" opacity="0"/>
+
+                        <circle id="pupil-l-${id}" cx="24" cy="33" r="2.3" fill="#18110b" opacity="0"/>
+                        <circle id="pupil-r-${id}" cx="40" cy="33" r="2.3" fill="#18110b" opacity="0"/>
+
+                        <path id="eyelid-l-${id}" d="M19 33 Q24 33 29 33" stroke="#231610" stroke-width="3.2" fill="none" opacity="0"/>
+                        <path id="eyelid-r-${id}" d="M35 33 Q40 33 45 33" stroke="#231610" stroke-width="3.2" fill="none" opacity="0"/>
+
+                        <path id="wrinkle-${id}" d="M30 35 Q32 34 34 35 M29 37 Q32 36 35 37" stroke="#5d3622" stroke-width="1.5" fill="none" opacity="0"/>
+
+                        <path id="mouth-${id}" d="M25 48 Q32 54 39 48" stroke="#683424" stroke-width="2.4" stroke-linecap="round" fill="none" opacity="0"/>
+                    </svg>
+                </div>
+
+                <!-- Badan 2D Utuh: Anatomi Terpadu Satu Kerangka -->
+                <svg class="char-body-svg" viewBox="0 0 110 190">
+                    <g>
+                        <path d="M41 120 L36 179 L47 179 L51 120 Z" fill="#1b1c1e" stroke="#101112" stroke-width="1.5"/>
+                        <path d="M56 120 L60 179 L71 179 L66 120 Z" fill="#222327" stroke="#101112" stroke-width="1.5"/>
+                        <path d="M38 147 Q43 152 46 148 M59 149 Q63 154 67 150" stroke="#2d3036" stroke-width="1.5" fill="none"/>
+                        <path d="M32 179 L49 179 C50 184 45 188 37 188 C31 188 30 183 32 179 Z" fill="#0d0e10"/>
+                        <path d="M59 179 L76 179 C78 184 74 188 66 188 C60 188 58 183 59 179 Z" fill="#0d0e10"/>
+                    </g>
+
+                    <!-- GRUP BADAN & LENGAN TERSAMBUNG KOKOH -->
+                    <g class="upper-torso-group" id="upper-torso-${id}">
+                        <path d="M26 60 L20 122 Q53 128 86 122 L80 60 Q53 52 26 60 Z" fill="#73685f" stroke="#48413b" stroke-width="1.5"/>
+                        <line x1="53.5" y1="58" x2="53.5" y2="122" stroke="#48413b" stroke-width="2"/>
+                        <circle cx="53.5" cy="70" r="1.5" fill="#2b2723"/>
+                        <circle cx="53.5" cy="84" r="1.5" fill="#2b2723"/>
+                        <circle cx="53.5" cy="98" r="1.5" fill="#2b2723"/>
+
+                        <rect x="33" y="68" width="15" height="13" rx="1.5" fill="#655b53" stroke="#48413b" stroke-width="1"/>
+                        <path d="M33 68 L40.5 72 L48 68 Z" fill="#524a43" stroke="#48413b" stroke-width="0.8"/>
+
+                        <rect x="58" y="68" width="15" height="13" rx="1.5" fill="#655b53" stroke="#48413b" stroke-width="1"/>
+                        <path d="M58 68 L65.5 72 L73 68 Z" fill="#524a43" stroke="#48413b" stroke-width="0.8"/>
+
+                        <polygon points="53.5,61 44,53 35,59 43,64" fill="#84786e" stroke="#48413b" stroke-width="1"/>
+                        <polygon points="53.5,61 63,53 72,59 64,64" fill="#84786e" stroke="#48413b" stroke-width="1"/>
+
+                        ${generateFixedActivitySVG(activityType)}
+                    </g>
+                </svg>
+            `;
+        }
+
+        function initRound() {
+            activeIntervals.forEach(clearInterval);
+            activeIntervals = [];
+
+            const level = document.getElementById('levelSelect').value;
+            const config = levelData[level];
+            briefing.innerHTML = `<b>Petunjuk Level:</b> ${config.hint}`;
+            statusText.innerText = "Siap. Klik 'Bunyikan Kentut'!";
+            isInvestigating = false;
+
+            document.querySelectorAll('.cafe-table').forEach(t => t.remove());
+
+            let charIndex = 0;
+            config.tables.forEach((numChars) => {
+                const table = document.createElement('div');
+                table.className = 'cafe-table';
+
+                const items = document.createElement('div');
+                items.className = 'table-items';
+                items.innerHTML = '☕ 🥐 📱';
+                table.appendChild(items);
+
+                for (let i = 0; i < numChars; i++) {
+                    const cId = charIndex++;
+                    const card = document.createElement('div');
+                    card.className = 'char-card';
+                    card.id = `char-node-${cId}`;
+                    card.onclick = () => makeGuess(cId);
+                    card.innerHTML = renderCharacterHTML(cId);
+                    table.appendChild(card);
+                }
+                stage.appendChild(table);
+            });
+
+            totalChars = charIndex;
+
+            // ZERO PATTERN: Pelaku murni diacak setiap ronde
+            culpritId = Math.floor(Math.random() * totalChars);
+            resetAllFaceExpressions();
+        }
+
+        function resetAllFaceExpressions() {
+            activeIntervals.forEach(clearInterval);
+            activeIntervals = [];
+
+            for (let i = 0; i < totalChars; i++) {
+                const head = document.getElementById(`head-rig-${i}`);
+                if (!head) continue;
+                head.className = 'head-rig';
+                head.style.transform = 'translateX(-50%)';
+
+                document.getElementById(`blush-${i}`).style.opacity = '0';
+                document.getElementById(`sweat-${i}`).style.opacity = '0';
+
+                document.getElementById(`brow-l-${i}`).setAttribute('opacity', '0');
+                document.getElementById(`brow-r-${i}`).setAttribute('opacity', '0');
+                document.getElementById(`pupil-l-${i}`).setAttribute('opacity', '0');
+                document.getElementById(`pupil-r-${i}`).setAttribute('opacity', '0');
+                document.getElementById(`eyelid-l-${i}`).setAttribute('opacity', '0');
+                document.getElementById(`eyelid-r-${i}`).setAttribute('opacity', '0');
+                document.getElementById(`wrinkle-${i}`).setAttribute('opacity', '0');
+                document.getElementById(`mouth-${i}`).setAttribute('opacity', '0');
+
+                const card = document.getElementById(`char-node-${i}`);
+                card.classList.remove('accused-correct', 'accused-wrong', 'anim-guilty-shake');
+            }
+        }
+
+        function triggerScene() {
+            resetAllFaceExpressions();
+            statusText.innerText = "Mendengarkan seisi kafe...";
+            isInvestigating = false;
+
+            const currentLevel = document.getElementById('levelSelect').value;
+
+            // Putar file suara kentut dari folder
+            playFartSound();
+
+            // Selaraskan reaksi dengan puncak letupan suara kentut
+            setTimeout(() => {
+                isInvestigating = true;
+                statusText.innerText = "👉 AMATI KEGIATAN & WAJAH YANG PANIK!";
+                animateEveryoneInCafe(currentLevel);
+            }, 1100);
+        }
+
+        function animateEveryoneInCafe(level) {
+            for (let i = 0; i < totalChars; i++) {
+                if (i === culpritId) continue;
+
+                const head = document.getElementById(`head-rig-${i}`);
+                const bL = document.getElementById(`brow-l-${i}`);
+                const bR = document.getElementById(`brow-r-${i}`);
+                const pL = document.getElementById(`pupil-l-${i}`);
+                const pR = document.getElementById(`pupil-r-${i}`);
+                const eL = document.getElementById(`eyelid-l-${i}`);
+                const eR = document.getElementById(`eyelid-r-${i}`);
+                const wrinkle = document.getElementById(`wrinkle-${i}`);
+                const mouth = document.getElementById(`mouth-${i}`);
+
+                const expressionMode = i % 5;
+
+                setTimeout(() => {
+                    if (expressionMode === 0) {
+                        head.classList.add('anim-sniff');
+                        wrinkle.setAttribute('opacity', '1');
+                        pL.setAttribute('opacity', '1');
+                        pR.setAttribute('opacity', '1');
+                        pL.setAttribute('cx', '21');
+                        pR.setAttribute('cx', '37');
+                    } else if (expressionMode === 1) {
+                        head.classList.add('anim-disgust');
+                        bL.setAttribute('opacity', '1');
+                        bR.setAttribute('opacity', '1');
+                        bL.setAttribute('d', 'M19 31 L29 27');
+                        bR.setAttribute('d', 'M35 27 L45 31');
+                        eL.setAttribute('opacity', '1');
+                        eR.setAttribute('opacity', '1');
+                        mouth.setAttribute('opacity', '1');
+                        mouth.setAttribute('d', 'M25 50 Q32 44 39 50');
+                    } else if (expressionMode === 2) {
+                        head.classList.add('anim-shock');
+                        bL.setAttribute('opacity', '1');
+                        bR.setAttribute('opacity', '1');
+                        bL.setAttribute('d', 'M19 24 Q24 21 29 24');
+                        bR.setAttribute('d', 'M35 24 Q40 21 45 24');
+                        pL.setAttribute('opacity', '1');
+                        pR.setAttribute('opacity', '1');
+                        mouth.setAttribute('opacity', '1');
+                        mouth.setAttribute('d', 'M27 46 Q32 53 37 46');
+                    } else if (expressionMode === 3) {
+                        head.classList.add('anim-suspicious');
+                        bL.setAttribute('opacity', '1');
+                        bR.setAttribute('opacity', '1');
+                        bL.setAttribute('d', 'M19 24 Q24 22 29 25');
+                        bR.setAttribute('d', 'M35 28 Q40 28 45 29');
+                        pL.setAttribute('opacity', '1');
+                        pR.setAttribute('opacity', '1');
+                        pL.setAttribute('cx', '27');
+                        pR.setAttribute('cx', '43');
+                    } else {
+                        head.classList.add('anim-confused');
+                        bL.setAttribute('opacity', '1');
+                        bR.setAttribute('opacity', '1');
+                        bL.setAttribute('d', 'M19 26 Q24 24 29 25');
+                        bR.setAttribute('d', 'M35 25 Q40 23 45 24');
+                        mouth.setAttribute('opacity', '1');
+                        mouth.setAttribute('d', 'M26 48 Q32 47 38 49');
+                    }
+                }, 100 + Math.random() * 200);
+            }
+
+            // EKSPRESI PELAKU
+            const cCard = document.getElementById(`char-node-${culpritId}`);
+            const cBlush = document.getElementById(`blush-${culpritId}`);
+            const cSweat = document.getElementById(`sweat-${culpritId}`);
+            const cPupilL = document.getElementById(`pupil-l-${culpritId}`);
+            const cPupilR = document.getElementById(`pupil-r-${culpritId}`);
+            const cBrowL = document.getElementById(`brow-l-${culpritId}`);
+            const cBrowR = document.getElementById(`brow-r-${culpritId}`);
+            const cMouth = document.getElementById(`mouth-${culpritId}`);
+
+            if (level === 'easy') {
+                cCard.classList.add('anim-guilty-shake');
+                cBlush.style.opacity = '1';
+                cSweat.style.opacity = '1';
+
+                cPupilL.setAttribute('opacity', '1');
+                cPupilR.setAttribute('opacity', '1');
+                cBrowL.setAttribute('opacity', '1');
+                cBrowR.setAttribute('opacity', '1');
+                cBrowL.setAttribute('d', 'M19 25 Q24 22 29 26');
+                cBrowR.setAttribute('d', 'M35 26 Q40 22 45 25');
+
+                let dart = false;
+                const interval = setInterval(() => {
+                    if (!isInvestigating) return;
+                    dart = !dart;
+                    cPupilL.setAttribute('cx', dart ? '20' : '28');
+                    cPupilR.setAttribute('cx', dart ? '36' : '44');
+                }, 300);
+                activeIntervals.push(interval);
+            } else if (level === 'medium') {
+                cBlush.style.opacity = '0.55';
+                cPupilL.setAttribute('opacity', '1');
+                cPupilR.setAttribute('opacity', '1');
+                cPupilL.setAttribute('cx', '27');
+                cPupilR.setAttribute('cx', '43');
+                cMouth.setAttribute('opacity', '1');
+                cMouth.setAttribute('d', 'M26 48 L38 48');
+            } else if (level === 'hard') {
+                cPupilL.setAttribute('opacity', '1');
+                cPupilR.setAttribute('opacity', '1');
+                cPupilL.setAttribute('cx', '21');
+                cPupilR.setAttribute('cx', '37');
+                cMouth.setAttribute('opacity', '1');
+                cMouth.setAttribute('d', 'M27 48 L37 48');
+
+                setTimeout(() => {
+                    cPupilL.setAttribute('opacity', '0');
+                    cPupilR.setAttribute('opacity', '0');
+                    cMouth.setAttribute('opacity', '0');
+                }, 500);
+            } else if (level === 'expert') {
+                cPupilL.setAttribute('opacity', '1');
+                cPupilR.setAttribute('opacity', '1');
+                cPupilL.setAttribute('cx', '22');
+                cPupilR.setAttribute('cx', '38');
+
+                setTimeout(() => {
+                    cPupilL.setAttribute('opacity', '0');
+                    cPupilR.setAttribute('opacity', '0');
+                }, 200);
+            }
+        }
+
+        function makeGuess(guessedId) {
+            if (!isInvestigating) return;
+            isInvestigating = false;
+
+            activeIntervals.forEach(clearInterval);
+            activeIntervals = [];
+
+            const guessedCard = document.getElementById(`char-node-${guessedId}`);
+            const culpritCard = document.getElementById(`char-node-${culpritId}`);
+            const pointsMap = { easy: 10, medium: 20, hard: 35, expert: 50 };
+
+            if (guessedId === culpritId) {
+                score += pointsMap[document.getElementById('levelSelect').value];
+                streak++;
+                statusText.innerHTML = "🎯 <span style='color:#2ecc71;'>TEPAT SEKALI! Pelakunya tertangkap basah!</span>";
+                guessedCard.classList.add('accused-correct');
+
+                document.getElementById(`blush-${culpritId}`).style.opacity = '1';
+                document.getElementById(`sweat-${culpritId}`).style.opacity = '1';
+            } else {
+                streak = 0;
+                statusText.innerHTML = "❌ <span style='color:#e74c3c;'>SALAH TUDUH! Dia cuma pengunjung biasa!</span>";
+                guessedCard.classList.add('accused-wrong');
+
+                setTimeout(() => {
+                    culpritCard.classList.add('accused-correct');
+                    document.getElementById(`blush-${culpritId}`).style.opacity = '1';
+                    document.getElementById(`sweat-${culpritId}`).style.opacity = '1';
+                }, 350);
+            }
+
+            document.getElementById('scoreVal').innerText = score;
+            document.getElementById('streakVal').innerText = streak;
+        }
+
+        window.onload = () => {
+            initRound();
+        };
+    </script>
+</body>
+</html>
